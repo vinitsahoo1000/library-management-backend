@@ -191,3 +191,45 @@ userRouter.put('/rent/:id',authMiddleware,async(req:Request,res:Response):Promis
 })
 
 
+userRouter.put("/return-book",authMiddleware,async(req:Request,res:Response):Promise<any>=>{
+    try{
+        const userId = req.id
+
+        const isUserRented = await prisma.rented.findFirst({
+            where:{
+                UserId: userId
+            }
+        })
+
+        if(!isUserRented){
+            return res.send({
+                message: "You have not rented any book!!"
+            })
+        }
+
+        await prisma.book.update({
+            where:{
+                id: isUserRented.BookId
+            },
+            data:{
+                rented: false
+            }
+        })
+
+        await prisma.rented.delete({
+            where:{
+                id: isUserRented.id
+            }
+        })
+
+        return res.json({
+            message: "Book returned succesfully!!!!"
+        })
+
+    }catch(error){
+        return res.status(500).send({
+            message: "Internal server error!!!"
+        })
+
+    }
+})
