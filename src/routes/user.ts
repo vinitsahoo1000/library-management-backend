@@ -115,3 +115,79 @@ userRouter.get('/verify',authMiddleware,async(req:Request,res:Response):Promise<
             res.status(500).json({message:"Internal server error"})
         }
 })
+
+
+userRouter.get('/allBooks',authMiddleware,async(req:Request,res:Response):Promise<any>=>{
+    try{
+        const allBooks = await prisma.book.findMany({})
+
+        return res.json({
+            books: allBooks
+        })
+
+    }catch(error){
+        return res.status(500).send({
+            msg: "Internal Server error!!!"
+        })
+
+    }
+})
+
+
+userRouter.put('/rent/:id',authMiddleware,async(req:Request,res:Response):Promise<any>=>{
+    try{
+        const bookId = req.params.id;
+        const userId = req.id;
+
+        const book = await prisma.book.findFirst({
+            where:{
+                id: bookId
+            }
+        })
+
+        if(book?.rented === true){
+            return res.json({
+                message: "Book is already rented!!!"
+            })
+        }
+
+        const isUserAlreadyRented = await prisma.rented.findFirst({
+            where:{
+                UserId: userId!
+            }
+        })
+
+        if(isUserAlreadyRented){
+            return res.json({
+                message: "You have already rented a book"
+            })
+        }
+
+        await prisma.rented.create({
+            data:{
+                UserId: userId!,
+                BookId: bookId
+            }
+        })
+
+        await prisma.book.update({
+            where:{
+                id: bookId
+            },
+            data:{
+                rented: true
+            }
+        })
+
+        return res.json({
+            message: "Book is rented successfully!!!!"
+        })
+
+    }catch(error){
+        return res.status(500).send({
+            message: "Internal server error!!!!"
+        })
+    }
+})
+
+
