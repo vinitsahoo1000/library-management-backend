@@ -1,9 +1,3 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
-
 generator client {
   provider = "prisma-client-js"
 }
@@ -14,35 +8,31 @@ datasource db {
 }
 
 model User {
-  id        Int @id @default(autoincrement())
-  name      String
-  username  String @unique
-  password  String
+  id       Int    @id @default(autoincrement())
+  name     String
+  username String @unique
+  password String
+  role     Role   @default(USER)
+  book     Book[]
 }
-
-
-model Admin {
-  id        Int @id @default(autoincrement())
-  name      String
-  username  String @unique
-  password  String
-  book      Book[]
-}
-
 
 model Book {
-  id         String @id @default(uuid())
-  name       String 
+  id         String  @id @default(uuid())
+  name       String
   authorName String
   imageUrl   String?
   rented     Boolean @default(false)
   adminId    Int
-  Admin      Admin  @relation(fields: [adminId], references: [id])
+  Admin      User   @relation(fields: [adminId], references: [id])
 }
 
-
 model Rented {
-  id     Int   @id @default(autoincrement())
+  id     Int    @id @default(autoincrement())
   BookId String
   UserId Int
+}
+
+enum Role {
+  USER
+  ADMIN
 }

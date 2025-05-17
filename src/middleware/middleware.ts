@@ -40,11 +40,8 @@ export const authMiddleware = (req:Request,res:Response,next:NextFunction):void=
 
         const payload = decoded as jwt.JwtPayload;
 
-        console.log(payload)
-
         req.id = payload.userId;    
         req.username = payload.email;
-        req.type = payload.type;
         next();
     })
 }

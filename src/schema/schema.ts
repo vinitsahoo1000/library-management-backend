@@ -26,3 +26,8 @@ export const BookSchema = z.object({
     name: z.string().min(1),
     authorName: z.string().min(2)
 })
+
+export const EditBookSchema = z.object({
+    name: z.string().min(1).optional(),
+    authorName: z.string().min(1).optional()
+})

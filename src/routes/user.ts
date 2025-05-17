@@ -104,7 +104,19 @@ userRouter.get('/verify',authMiddleware,async(req:Request,res:Response):Promise<
     try{
         const username = req.username;
         const userId = req.id;
-    
+        
+        const user = await prisma.user.findUnique({
+            where:{
+                id: userId
+            }
+        })
+
+        if(!user){
+            return res.status(404).json({
+                message: "Not a User!!!"
+            })
+        }
+
         res.send({
             msg: "User verified successfully!!",
             username: username,
@@ -139,11 +151,15 @@ userRouter.put('/rent/:id',authMiddleware,async(req:Request,res:Response):Promis
         const bookId = req.params.id;
         const userId = req.id;
 
+        console.log("bookId:",bookId)
+        console.log("userId:",userId)
         const book = await prisma.book.findFirst({
             where:{
                 id: bookId
             }
         })
+
+        console.log(book)
 
         if(book?.rented === true){
             return res.json({
@@ -156,6 +172,8 @@ userRouter.put('/rent/:id',authMiddleware,async(req:Request,res:Response):Promis
                 UserId: userId!
             }
         })
+
+        console.log(isUserAlreadyRented)
 
         if(isUserAlreadyRented){
             return res.json({
