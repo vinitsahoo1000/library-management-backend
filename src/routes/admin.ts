@@ -110,7 +110,8 @@ adminRouter.get('/verify',authMiddleware,async(req:Request,res:Response):Promise
 
         const user = await prisma.user.findUnique({
             where: {
-                id: userId
+                id: userId,
+                role: "ADMIN"
             }
         })
 
